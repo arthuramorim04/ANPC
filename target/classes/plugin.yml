@@ -1,0 +1,7 @@
+name: ANpc
+version: 1.0
+main: com.arthuramorim.ANpc
+
+
+commands:
+  npc:

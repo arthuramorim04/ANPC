@@ -1,0 +1,6 @@
+com\arthuramorim\entity\NPC.class
+com\arthuramorim\monitor\PacketMonitor$1.class
+com\arthuramorim\ANpc.class
+com\arthuramorim\manager\NPCCreate.class
+com\arthuramorim\commands\NPCSummon.class
+com\arthuramorim\monitor\PacketMonitor.class
