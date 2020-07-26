@@ -6,19 +6,19 @@ import net.minecraft.server.v1_8_R3.*;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
-import org.bukkit.craftbukkit.v1_8_R3.CraftServer;
-import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
+import sun.misc.FloatingDecimal;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.UUID;
 
 
 /*
-* Classe para criacao de NPC do tipo humano
-* */
+ * Classe para criacao de NPC do tipo humano
+ * */
 
 public class NPC {
 
@@ -72,95 +72,77 @@ public class NPC {
 
         //Forma com reclect
 
-//        try {
-//            Object minecraftServer = getCraftBukkitClass("CraftServer").getMethod("getServer").invoke(Bukkit.getServer());
-//            Object worldServer = getCraftBukkitClass("CraftWorld").getMethod("getHandler").invoke(npcLocation.getWorld());
-//
-//            this.gameProfile = new GameProfile(UUID.randomUUID(), ChatColor.translateAlternateColorCodes('&', this.name));
-//            this.gameProfile.getProperties().put("textures", new Property("textures", texture, signature));
-//            //cria construtores usando reflect, assim podendo usar em versoes acima da 1.8
-//            Constructor<?> entityPlayerConstructor = getNMSClass("EntityPlayer").getDeclaredConstructors()[0];
-//            Constructor<?> interactManagerConstructor = getNMSClass("PlayerInteractManager").getDeclaredConstructors()[0];
-//
-//            //insntancia as entitys usando os contrutores acima
-//            this.entityPlayer = (EntityPlayer) entityPlayerConstructor.newInstance(minecraftServer, worldServer, gameProfile, interactManagerConstructor.newInstance(worldServer));
-//            this.entityPlayer.getClass().getMethod("setLocation", double.class, double.class, double.class, float.class, float.class).invoke(entityPlayer
-//                    , npcLocation.getX()
-//                    , npcLocation.getY()
-//                    , npcLocation.getZ()
-//                    , npcLocation.getYaw()
-//                    , npcLocation.getPitch());
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-        //Forma sem reflect
+        try {
+            Object minecraftServer = getCraftBukkitClass("CraftServer").getMethod("getServer").invoke(Bukkit.getServer());
+            Object worldServer = getCraftBukkitClass("CraftWorld").getMethod("getHandle").invoke(npcLocation.getWorld());
 
-        //Cria variaveis para o servidor e o mundo em que o npc foi criado
-        MinecraftServer minecraftServer = ((CraftServer) Bukkit.getServer()).getServer();
-        WorldServer worldServer = ((CraftWorld) npcLocation.getWorld()).getHandle();
-//
-//        //cria o perfil do npc com uma UUID random, e depois cria uma entidade
+            this.gameProfile = new GameProfile(UUID.randomUUID(), ChatColor.translateAlternateColorCodes('&', this.name));
+            this.gameProfile.getProperties().put("textures", new Property("textures", texture, signature));
+            //cria construtores usando reflect, assim podendo usar em versoes acima da 1.8
+            Constructor<?> entityPlayerConstructor = getNMSClass("EntityPlayer").getDeclaredConstructors()[0];
+            Constructor<?> interactManagerConstructor = getNMSClass("PlayerInteractManager").getDeclaredConstructors()[0];
 
-        this.gameProfile = new GameProfile(UUID.randomUUID(), ChatColor.translateAlternateColorCodes('&', this.name));
-        this.gameProfile.getProperties().put("textures", new Property("textures", texture, signature));
-        this.entityPlayer = new EntityPlayer(minecraftServer, worldServer, gameProfile, new PlayerInteractManager(worldServer));
-        this.entityPlayer.setLocation(npcLocation.getX(), npcLocation.getY(), npcLocation.getZ(), npcLocation.getYaw(), npcLocation.getPitch());
+            //insntancia as entitys usando os contrutores acima
+            this.entityPlayer = (EntityPlayer) entityPlayerConstructor.newInstance(minecraftServer, worldServer, gameProfile, interactManagerConstructor.newInstance(worldServer));
+            this.entityPlayer.getClass().getMethod("setLocation", double.class, double.class, double.class, float.class, float.class).invoke(entityPlayer
+                    , npcLocation.getX()
+                    , npcLocation.getY()
+                    , npcLocation.getZ()
+                    , npcLocation.getYaw()
+                    , npcLocation.getPitch());
 
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void showNPC(Player p) {
 
         //forma com reflect
-//        try {
-//
-//            //PacketPlayOutPlayerInfo - Definindo packets de informacao das entidades
-//            Object addPlayerEnum = getNMSClass("PacketPlayOutPlayerInfo$EnumPlayerInfoAction").getField("ADD_PLAYER").get(null);
-//            Constructor<?> packetPlatOutPlayerInfoConstructor = getNMSClass("PacketPlayOutPlayInfo").getConstructor(getNMSClass("PacketPlayOutPlayerInfo$EnumPlayerInfoAction")
-//                    , Class.forName("[Lnet.minecraft.server." + getVersion() + ".EntityPlayer;"));
-//
-//            Object array = Array.newInstance(getNMSClass("EntityPlayer"),1);
-//            Array.set(array,0,this.entityPlayer);
-//            Object packetPlayOutPlayerInfo = packetPlatOutPlayerInfoConstructor.newInstance(addPlayerEnum,array);
-//            sendPacket(p, packetPlayOutPlayerInfo);
-//
-//            // PacketPlayOutEntitySpawn - Spawner entidade no mundo
-//            Constructor<?> packetPlayOutNAmedEntitySpawnConstructor = getNMSClass("PacketPlayOutNamedEntitySpawn").getConstructor(getNMSClass("EntityHuman"));
-//            Object packetPlayOutNameEntitySpawn = packetPlayOutNAmedEntitySpawnConstructor.newInstance(this.entityPlayer);
-//            sendPacket(p,packetPlayOutNameEntitySpawn);
-//
-//            //PacketPlayOutEntityHeadRotation -- Rotacao da cabeca do NPC
-//            Constructor<?> packetPlayOutEntityHeadRotationConstructor = getNMSClass("PacketPlayOutEntityHeadRotation").getConstructor(getNMSClass("Entity"),byte.class);
-//            Double yaw = (Double) this.entityPlayer.getClass().getField("yaw").get(this.entityPlayer);
-//            Object packetPlayOutEntityHeadRotation = packetPlayOutEntityHeadRotationConstructor.newInstance(this.entityPlayer, (byte) (yaw * 256 / 360));
-//            sendPacket(p,packetPlayOutEntityHeadRotation);
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        try {
 
-        //Forma sem reflect
+            //PacketPlayOutPlayerInfo - Definindo packets de informacao das entidades
+            Object addPlayerEnum = getNMSClass("PacketPlayOutPlayerInfo$EnumPlayerInfoAction").getField("ADD_PLAYER").get(null);
+            Constructor<?> packetPlayOutPlayerInfoConstructor = getNMSClass("PacketPlayOutPlayerInfo").getConstructor(getNMSClass("PacketPlayOutPlayerInfo$EnumPlayerInfoAction")
+                    , Class.forName("[Lnet.minecraft.server." + getVersion() + ".EntityPlayer;"));
 
-        PlayerConnection playerConnection = ((CraftPlayer) p).getHandle().playerConnection;
+            Object array = Array.newInstance(getNMSClass("EntityPlayer"), 1);
+            Array.set(array, 0, this.entityPlayer);
 
-        playerConnection.sendPacket(new PacketPlayOutPlayerInfo(PacketPlayOutPlayerInfo.EnumPlayerInfoAction.ADD_PLAYER, entityPlayer));
-        playerConnection.sendPacket(new PacketPlayOutNamedEntitySpawn(entityPlayer));
-        playerConnection.sendPacket(new PacketPlayOutEntityHeadRotation(entityPlayer, (byte) (entityPlayer.yaw * 256 / 360)));
+            Object packetPlayOutPlayerInfo = packetPlayOutPlayerInfoConstructor.newInstance(addPlayerEnum, array);
+            sendPacket(p, packetPlayOutPlayerInfo);
+
+            // PacketPlayOutEntitySpawn - Spawner entidade no mundo
+            // PacketPlayOutEntitySpawn - Spawner entidade no mundo
+            Constructor<?> packetPlayOutNAmedEntitySpawnConstructor = getNMSClass("PacketPlayOutNamedEntitySpawn").getConstructor(getNMSClass("EntityHuman"));
+            Object packetPlayOutNameEntitySpawn = packetPlayOutNAmedEntitySpawnConstructor.newInstance(this.entityPlayer);
+            sendPacket(p,packetPlayOutNameEntitySpawn);
+
+            //PacketPlayOutEntityHeadRotation -- Rotacao da cabeca do NPC
+            Constructor<?> packetPlayOutEntityHeadRotationConstructor = getNMSClass("PacketPlayOutEntityHeadRotation").getConstructor(getNMSClass("Entity"), byte.class);
+            Float yawRaw = (Float) this.entityPlayer.getClass().getField("yaw").get(this.entityPlayer);
+            Double yaw = getFloatAsDouble(yawRaw);
+            Object packetPlayOutEntityHeadRotation = packetPlayOutEntityHeadRotationConstructor.newInstance(this.entityPlayer, (byte) (yaw * 256 / 360));
+            sendPacket(p,packetPlayOutEntityHeadRotation);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
     }
 
     public void sendPacket(Player p, Object packet) {
-        try{
-            Object handle = p.getClass().getMethod("getHandgetHandle").invoke(p);
+        try {
+            Object handle = p.getClass().getMethod("getHandle").invoke(p);
             Object playerConnection = handle.getClass().getField("playerConnection").get(handle);
 
-            playerConnection.getClass().getMethod("sendPacket").invoke(playerConnection,packet);
-        }catch (Exception e){
+            playerConnection.getClass().getMethod("sendPacket", getNMSClass("Packet")).invoke(playerConnection, packet);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     private Class<?> getNMSClass(String name) {
-
         try {
             return Class.forName("net.minecraft.server." + getVersion() + "." + name);
         } catch (ClassNotFoundException e) {
@@ -180,7 +162,15 @@ public class NPC {
         return null;
     }
 
+    private void updateNPC(Player player, Packet<?> packet) {
+        ((CraftPlayer) player).getHandle().playerConnection.sendPacket(packet);
+    }
+
     private String getVersion() {
         return Bukkit.getServer().getClass().getPackage().getName().split("\\.")[3];
+    }
+
+    public static Double getFloatAsDouble(Float fValue) {
+        return Double.valueOf(fValue.toString());
     }
 }

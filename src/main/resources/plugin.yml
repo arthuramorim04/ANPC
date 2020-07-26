@@ -5,3 +5,4 @@ main: com.arthuramorim.ANpc
 
 commands:
   npc:
+  snake:

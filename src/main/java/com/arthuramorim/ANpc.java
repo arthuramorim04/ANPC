@@ -9,9 +9,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class ANpc extends JavaPlugin {
 
-    private PacketMonitor packetMonitor;
 
     private ProtocolManager protocol;
+    private PacketMonitor packetMonitor;
 
     @Override
     public void onEnable() {
@@ -19,9 +19,9 @@ public class ANpc extends JavaPlugin {
         super.onEnable();
 
         packetMonitor = new PacketMonitor(this);
-        packetMonitor.verifyPacket();
 
         getCommand("npc").setExecutor(new NPCSummon(this));
+        getCommand("snake").setExecutor(new NPCSummon(this));
     }
 
     @Override
@@ -36,5 +36,9 @@ public class ANpc extends JavaPlugin {
 
     public ProtocolManager getProtocol() {
         return protocol;
+    }
+
+    public PacketMonitor getPacketMonitor() {
+        return packetMonitor;
     }
 }

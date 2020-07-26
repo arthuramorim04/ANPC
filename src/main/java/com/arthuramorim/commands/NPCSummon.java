@@ -12,7 +12,11 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.craftbukkit.v1_8_R3.entity.CraftPlayer;
 import org.bukkit.entity.Player;
 
+import java.util.HashSet;
+
 public class NPCSummon implements CommandExecutor {
+
+    public HashSet<NPC> cacheNPC = new HashSet<>();
 
     private ANpc plugin;
 
@@ -26,22 +30,46 @@ public class NPCSummon implements CommandExecutor {
 
             if (sender instanceof Player) {
 
-                EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
+                try {
+                    EntityPlayer entityPlayer = ((CraftPlayer) player).getHandle();
 
 
-                GameProfile profile = entityPlayer.getProfile();
-                Property property = profile.getProperties().get("textures").iterator().next();
+                    GameProfile profile = entityPlayer.getProfile();
+                    Property property = profile.getProperties().get("textures").iterator().next();
 
-                String texture = property.getValue();
-                String signature = property.getSignature();
+                    String texture = property.getValue();
+                    String signature = property.getSignature();
 
-                NPC npc = new NPC(args[0], player.getLocation(),texture,signature);
-                npc.spawnNPC();
-                showNPC(npc, player);
+
+                    NPC npc = new NPC(args[0], player.getLocation(), texture, signature);
+                    npc.spawnNPC();
+                    showNPC(npc, player);
+                    getCacheNPC().add(npc);
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             } else {
                 sender.sendMessage("apoenas jogador pode executar esse comando");
             }
         }
+        if(command.getName().equalsIgnoreCase("snake")){
+            for (NPC npc : getCacheNPC()) {
+                if(npc.getName().equalsIgnoreCase(args[1])){
+                    if(args[0].equalsIgnoreCase("1")){
+                        npc.getEntityPlayer().setSneaking(true);
+
+                        npc.getEntityPlayer().move(0.5,0.0,0.5);
+                    }else{
+                        npc.getEntityPlayer().setSneaking(false);
+                    }
+                }
+            }
+
+
+        }
+
         return false;
     }
 
@@ -50,5 +78,7 @@ public class NPCSummon implements CommandExecutor {
         npc.showNPC(player);
     }
 
-
+    public HashSet<NPC> getCacheNPC() {
+        return cacheNPC;
+    }
 }
